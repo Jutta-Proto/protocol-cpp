@@ -30,3 +30,12 @@
 *.exe
 *.out
 *.app
+
+# Misc
+logs/
+build/
+
+# VScode clangd stuff
+.clangd/
+compile_commands.json
+.cache/

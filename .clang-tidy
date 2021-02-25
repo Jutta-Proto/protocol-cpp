@@ -1,0 +1,33 @@
+---
+Checks: '*,
+-cppcoreguidelines-pro-type-static-cast-downcast,
+-fuchsia-default-arguments-calls,
+-fuchsia-default-arguments,
+-fuchsia-default-arguments-declarations,
+-fuchsia-overloaded-operator,
+-fuchsia-statically-constructed-objects,
+-hicpp-use-auto,
+-modernize-use-auto,
+-modernize-use-trailing-return-type,
+-readability-implicit-bool-conversion,
+-readability-const-return-type,
+-google-runtime-references,
+-misc-non-private-member-variables-in-classes,
+-cppcoreguidelines-pro-bounds-array-to-pointer-decay,
+-hicpp-no-array-decay,
+-llvm-include-order,
+-cppcoreguidelines-non-private-member-variables-in-classes,
+-cppcoreguidelines-pro-type-vararg,
+-hicpp-vararg,
+-cppcoreguidelines-avoid-magic-numbers,
+-readability-magic-numbers,
+-cppcoreguidelines-owning-memory,
+-llvmlibc-implementation-in-namespace,
+-llvmlibc-callee-namespace,
+-llvmlibc-restrict-system-libc-headers,
+-fuchsia-multiple-inheritance,
+-hicpp-signed-bitwise
+'
+WarningsAsErrors: '*'
+HeaderFilterRegex: 'src/*.hpp'
+FormatStyle: file

@@ -1,0 +1,13 @@
+if (NOT ${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
+    find_program(CLANG_TIDY_EXECUTABLE NAMES clang-tidy-7 clang-tidy)
+    mark_as_advanced(CLANG_TIDY_EXECUTABLE)
+
+    if (${CLANG_TIDY_EXECUTABLE})
+        message(WARNING "Clang-tidy not found")
+    else()
+        message(STATUS "Enabling clang-tidy")
+        set(CMAKE_CXX_CLANG_TIDY "${CLANG_TIDY_EXECUTABLE};-warnings-as-errors=*")
+    endif()
+else()
+    message(STATUS "Clang-tidy is not supporten when building for windows")
+endif()
