@@ -1,5 +1,5 @@
 # JURA Protocol
-C++ JURA protocol implementation for controlling a Jura coffee maker over a serial (UART) connection.
+`C++` JURA protocol implementation for controlling a Jura coffee maker over a serial (UART) connection.
 
 This work is based on the excellent work done by the people over at [Protocol JURA](http://protocoljura.wiki-site.com/index.php/Hauptseite).
 They were able to figure out the basic protocol used for communication with older JURA coffee makers.
