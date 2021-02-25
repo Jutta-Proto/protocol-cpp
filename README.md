@@ -297,8 +297,8 @@ sudo adduser "$USER" dialout
 ```
 .
 ├── src # All the source code
-├── protocol # Snoops of the JURA communication with a Smart Connect [1]
-│   └── ...
+├── tests # All unit tests
+├── protocol_snoops # Snoops of the JURA communication with a Smart Connect [1]
 └── README.md
 ```
 `[1]`: https://uk.jura.com/en/homeproducts/accessories/SmartConnect-Main-72167
