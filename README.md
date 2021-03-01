@@ -226,57 +226,18 @@ The following list of commands has been tested on an `Jura E6 2019 platin (15326
 * `FN:04` # Turn off the coffee water heater
 * `FN:0D` # Reset the brew group and throw out the old coffee grain
 
-## Requirements
-This project builds on top the excellent [Espressif IoT Development Framework](https://github.com/espressif/esp-idf).
-Follow [this](https://docs.espressif.com/projects/esp-idf/en/release-v4.0/get-started/#installation-step-by-step) installation guide and install version **4.0.1** of the framework on your computer.
-
 ## Building
 
-### Step 0: Setup
 ```bash
 # Clone the repository:
-git clone https://github.com/COM8/esp32-jura.git
+git clone git@github.com:Jutta-Proto/protocol-cpp.git
 # Switch into the newly cloned repository:
-cd esp32-jura
-# Initialize the repository.
-# This call will download further repositories and moves them to their appropriate place.
-./init.sh
-```
-
-### Step 1: Credentials.hpp
-To be able to build the project you have to create the following file: ``  
-Paste the following content in this newly created file:
-```c++
-#pragma once
-
-#include <string>
-
-//---------------------------------------------------------------------------
-namespace esp32jura {
-//---------------------------------------------------------------------------
-/**
- * This file contains credentials for debugging the XMPP and WIFI connection,
- * without having to go through the usual setup procedure.
- * To apply these settings uncomment the "initWithDummyValues()" call in the "Esp32Jura.cpp" file.
- *
- * !!NEVER COMMIT THIS FILE!!
- **/
-const std::string SSID = "Your WIFI SSID";
-const std::string PASSWORD = "Your WIFI Password";
-const std::string JID = "JID of this device";
-const std::string JID_PASSWORD = "Password for the JID of this device";
-const std::string JID_SENDER = "The owner JID of this device";
-//---------------------------------------------------------------------------
-}  // namespace esp32jura
-//---------------------------------------------------------------------------
-```
-This file contains debug and testing credentials for deploying the application on an esp32 without having to go through the usual setup procedure.
-
-### Step 3: Build
-You can build the project with the following command:
-```bash
-cd esp32
-idf.py build
+cd protocol-cpp
+# Build the project:
+mkdir build
+cd build
+cmake ..
+cmake --build .
 ```
 
 ### Step 4: Flash
