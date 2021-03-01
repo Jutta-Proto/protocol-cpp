@@ -51,7 +51,7 @@ void CoffeeMaker::brew_coffee(coffee_t coffee) {
 }
 
 size_t CoffeeMaker::get_page_num(coffee_t coffee) {
-    for (const std::pair<coffee_t, size_t>& c : coffee_page_map) {
+    for (const std::pair<const coffee_t, size_t>& c : coffee_page_map) {
         if (c.first == coffee) {
             return c.second;
         }
@@ -61,7 +61,7 @@ size_t CoffeeMaker::get_page_num(coffee_t coffee) {
 }
 
 CoffeeMaker::jutta_button_t CoffeeMaker::get_button_num(coffee_t coffee) {
-    for (const std::pair<coffee_t, jutta_button_t>& c : coffee_button_map) {
+    for (const std::pair<const coffee_t, jutta_button_t>& c : coffee_button_map) {
         if (c.first == coffee) {
             return c.second;
         }
@@ -151,6 +151,7 @@ bool CoffeeMaker::write_and_wait(const std::string& s) {
 void CoffeeMaker::pump_hot_water(const std::chrono::milliseconds& waterTime) {
     write_and_wait(JUTTA_COFFEE_WATER_PUMP_ON);
     std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now() + waterTime;
+    // NOLINTNEXTLINE (hicpp-use-nullptr, modernize-use-nullptr)
     while (std::chrono::steady_clock::now() < end) {
         write_and_wait(JUTTA_COFFEE_WATER_HEATER_ON);
         std::cout << "Heater turned on.\n";

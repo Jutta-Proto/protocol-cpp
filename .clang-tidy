@@ -26,7 +26,8 @@ Checks: '*,
 -llvmlibc-callee-namespace,
 -llvmlibc-restrict-system-libc-headers,
 -fuchsia-multiple-inheritance,
--hicpp-signed-bitwise
+-hicpp-signed-bitwise,
+-misc-no-recursion
 '
 WarningsAsErrors: '*'
 HeaderFilterRegex: 'src/*.hpp'

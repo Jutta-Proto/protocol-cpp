@@ -78,12 +78,12 @@ SerialConnection::~SerialConnection() {
     closeTty();
 }
 
-size_t SerialConnection::read(std::array<uint8_t, 4>& buffer) {
+size_t SerialConnection::read_serial(std::array<uint8_t, 4>& buffer) {
     assert(state == SC_READY);
     return read(fd, buffer.data(), buffer.size());
 }
 
-size_t SerialConnection::write(const std::array<uint8_t, 4>& data) {
+size_t SerialConnection::write_serial(const std::array<uint8_t, 4>& data) {
     assert(state == SC_READY);
     size_t result = write(fd, data.data(), data.size());
     return result;
@@ -96,7 +96,7 @@ void SerialConnection::flush() const {
 
 void SerialConnection::flush_read_buffer() {
     std::array<uint8_t, 4> buffer{};
-    while (read(buffer) >= 0) {}
+    while (read_serial(buffer) > 0) {}
 }
 //---------------------------------------------------------------------------
 }  // namespace serial

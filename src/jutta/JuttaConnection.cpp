@@ -145,7 +145,7 @@ uint8_t JuttaConnection::decode(const std::array<uint8_t, 4>& encData) {
 }
 
 bool JuttaConnection::write_encoded(const std::array<uint8_t, 4>& encData) {
-    bool result = serial.write(encData);
+    bool result = serial.write_serial(encData);
     serial.flush();
     std::this_thread::sleep_for(std::chrono::milliseconds{8});
     return result;
@@ -155,24 +155,27 @@ size_t JuttaConnection::read_encoded(std::vector<std::array<uint8_t, 4>>& data) 
     // Wait 8 ms for the next bunch of data to arrive:
     std::this_thread::sleep_for(std::chrono::milliseconds{8});
 
-    std::array<uint8_t, 4> buffer{};
-    size_t size = serial.read(buffer);
-    if (size <= 0) {
-        return data.size();
+    while (true) {
+        std::array<uint8_t, 4> buffer{};
+        size_t size = serial.read_serial(buffer);
+        if (size <= 0) {
+            break;
+        }
+        if (size < 4) {
+            std::cerr << "Invalid amount of UART data found (" << size << " byte) - flushing.\n";
+            flush_read_buffer();
+            break;
+        }
+        data.push_back(buffer);
     }
-    if (size < 4) {
-        std::cerr << "Invalid amount of UART data found (" << size << " byte) - flushing.\n";
-        flush_read_buffer();
-        return data.size();
-    }
-    data.push_back(buffer);
-    return read_encoded(data);
+    return data.size();
 }
 
 bool JuttaConnection::wait_for_ok(const std::chrono::milliseconds& timeout) {
     std::vector<uint8_t> buffer;
 
     std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
+    // NOLINTNEXTLINE (hicpp-use-nullptr, modernize-use-nullptr)
     while ((timeout.count() <= 0) || ((std::chrono::steady_clock::now() - start) < timeout)) {
         if (read_decoded(buffer)) {
             for (size_t i = 0; (buffer.size() >= 5) && (i < buffer.size() - 4); i++) {
