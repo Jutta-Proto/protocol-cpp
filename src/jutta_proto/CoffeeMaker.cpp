@@ -14,9 +14,9 @@ namespace jutta_proto {
 //---------------------------------------------------------------------------
 CoffeeMaker::CoffeeMaker() : connection("SOME PORT") {}
 
+// NOLINTNEXTLINE (readability-convert-member-functions-to-static)
 void CoffeeMaker::init() {
     std::cout << "Initializing coffee maker...\n";
-    connection.init();
     std::cout << "Coffee maker initialized.\n";
 }
 

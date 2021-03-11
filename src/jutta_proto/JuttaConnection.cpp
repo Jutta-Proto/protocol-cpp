@@ -151,19 +151,26 @@ bool JuttaConnection::write_encoded(const std::array<uint8_t, 4>& encData) {
     return result;
 }
 
+bool JuttaConnection::read_encoded(std::array<uint8_t, 4>& buffer) {
+    size_t size = serial.read_serial(buffer);
+    if (size <= 0) {
+        return false;
+    }
+    if (size < 4) {
+        std::cerr << "Invalid amount of UART data found (" << size << " byte) - flushing.\n";
+        flush_read_buffer();
+        return false;
+    }
+    return true;
+}
+
 size_t JuttaConnection::read_encoded(std::vector<std::array<uint8_t, 4>>& data) {
     // Wait 8 ms for the next bunch of data to arrive:
     std::this_thread::sleep_for(std::chrono::milliseconds{8});
 
     while (true) {
         std::array<uint8_t, 4> buffer{};
-        size_t size = serial.read_serial(buffer);
-        if (size <= 0) {
-            break;
-        }
-        if (size < 4) {
-            std::cerr << "Invalid amount of UART data found (" << size << " byte) - flushing.\n";
-            flush_read_buffer();
+        if (!read_encoded(buffer)) {
             break;
         }
         data.push_back(buffer);

@@ -21,11 +21,6 @@ class JuttaConnection {
     explicit JuttaConnection(const std::string& device);
 
     /**
-     * Initializes UART connection.
-     **/
-    void init();
-
-    /**
      * Tries to read a single decoded byte.
      * This requires reading 4 JUTTA bytes and converting them to a single actual data byte.
      * The result will be stored in the given "byte" pointer.
