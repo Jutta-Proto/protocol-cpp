@@ -18,4 +18,14 @@ target_sources(jutta_proto PRIVATE
     jutta_proto/JuttaConnection.hpp
     jutta_proto/JuttaCommands.hpp)
 
-install(DIRECTORY cpr DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+target_include_directories(logger PUBLIC  
+    $<INSTALL_INTERFACE:include>    
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>)
+
+target_sources(logger PRIVATE
+     # Header files (useful in IDEs)
+     logger/Logger.hpp)
+
+install(DIRECTORY serial DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+install(DIRECTORY jutta_proto DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+install(DIRECTORY logger DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})

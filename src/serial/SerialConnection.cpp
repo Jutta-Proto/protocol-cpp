@@ -98,6 +98,11 @@ void SerialConnection::flush_read_buffer() {
     std::array<uint8_t, 4> buffer{};
     while (read_serial(buffer) > 0) {}
 }
+
+std::vector<std::string> SerialConnection::get_available_ports() {
+    std::vector<std::string> ports{};
+    return ports;
+}
 //---------------------------------------------------------------------------
 }  // namespace serial
 //---------------------------------------------------------------------------

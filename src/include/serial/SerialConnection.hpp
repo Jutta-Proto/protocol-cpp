@@ -39,6 +39,11 @@ class SerialConnection {
      **/
     void flush_read_buffer();
 
+    /**
+     * Returns all available serial port paths for this device.
+     **/
+    static std::vector<std::string> get_available_ports();
+
  private:
     void openTty(const std::string& device);
     void configureTty();
