@@ -7,6 +7,7 @@ add_library(jutta_proto STATIC CoffeeMaker.hpp
                          JuttaConnection.cpp)
 
 target_link_libraries(jutta_proto PRIVATE serial)
+target_include_directories(jutta_proto PRIVATE .)
 
 # Set version for shared libraries.
 set_target_properties(jutta_proto
