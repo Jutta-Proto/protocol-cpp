@@ -17,6 +17,7 @@ option(BUILD_TESTING "Build tests" OFF)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 
+include(GNUInstallDirs)
 include(sanitizer)
 include(gcc_analyze)
 

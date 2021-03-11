@@ -8,7 +8,7 @@
 #include "JuttaConnection.hpp"
 
 //---------------------------------------------------------------------------
-namespace jutta {
+namespace jutta_proto {
 //---------------------------------------------------------------------------
 class CoffeeMaker {
  public:
@@ -113,5 +113,5 @@ class CoffeeMaker {
     void pump_hot_water(const std::chrono::milliseconds& waterTime);
 };
 //---------------------------------------------------------------------------
-}  // namespace jutta
+}  // namespace jutta_proto
 //---------------------------------------------------------------------------

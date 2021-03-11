@@ -3,7 +3,7 @@
 #include <string>
 
 //---------------------------------------------------------------------------
-namespace jutta {
+namespace jutta_proto {
 //---------------------------------------------------------------------------
 const std::string JUTTA_POWER_OFF = "AN:01\r\n";
 const std::string JUTTA_TEST_MODE_ON = "AN:20\r\n";
@@ -30,5 +30,5 @@ const std::string JUTTA_COFFEE_WATER_HEATER_OFF = "FN:04\r\n";
 const std::string JUTTA_COFFEE_WATER_PUMP_ON = "FN:01\r\n";
 const std::string JUTTA_COFFEE_WATER_PUMP_OFF = "FN:02\r\n";
 //---------------------------------------------------------------------------
-}  // namespace jutta
+}  // namespace jutta_proto
 //---------------------------------------------------------------------------

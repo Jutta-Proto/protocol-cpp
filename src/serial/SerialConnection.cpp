@@ -1,4 +1,4 @@
-#include "SerialConnection.hpp"
+#include "serial/SerialConnection.hpp"
 #include <cassert>
 #include <cstddef>
 #include <iostream>

@@ -8,7 +8,7 @@
 #include "serial/SerialConnection.hpp"
 
 //---------------------------------------------------------------------------
-namespace jutta {
+namespace jutta_proto {
 //---------------------------------------------------------------------------
 class JuttaConnection {
  private:
@@ -127,5 +127,5 @@ class JuttaConnection {
     size_t read_encoded(std::vector<std::array<uint8_t, 4>>& data);
 };
 //---------------------------------------------------------------------------
-}  // namespace jutta
+}  // namespace jutta_proto
 //---------------------------------------------------------------------------

@@ -1,4 +1,4 @@
-#include "JuttaConnection.hpp"
+#include "jutta_proto/JuttaConnection.hpp"
 
 #include <algorithm>
 #include <cassert>
@@ -9,7 +9,7 @@
 #include <thread>
 
 //---------------------------------------------------------------------------
-namespace jutta {
+namespace jutta_proto {
 //---------------------------------------------------------------------------
 JuttaConnection::JuttaConnection(const std::string& device) : serial(device) {}
 
@@ -195,5 +195,5 @@ void JuttaConnection::flush_read_buffer() {
 }
 
 //---------------------------------------------------------------------------
-}  // namespace jutta
+}  // namespace jutta_proto
 //---------------------------------------------------------------------------

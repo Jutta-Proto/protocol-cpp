@@ -1,4 +1,4 @@
-#include "CoffeeMaker.hpp"
+#include "jutta_proto/CoffeeMaker.hpp"
 
 #include <cassert>
 #include <iomanip>
@@ -7,10 +7,10 @@
 #include <string>
 #include <thread>
 
-#include "JuttaCommands.hpp"
+#include "jutta_proto/JuttaCommands.hpp"
 
 //---------------------------------------------------------------------------
-namespace jutta {
+namespace jutta_proto {
 //---------------------------------------------------------------------------
 CoffeeMaker::CoffeeMaker() : connection("SOME PORT") {}
 
@@ -166,5 +166,5 @@ void CoffeeMaker::pump_hot_water(const std::chrono::milliseconds& waterTime) {
 bool CoffeeMaker::is_locked() const { return locked; }
 
 //---------------------------------------------------------------------------
-}  // namespace jutta
+}  // namespace jutta_proto
 //---------------------------------------------------------------------------
