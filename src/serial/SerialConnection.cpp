@@ -58,7 +58,7 @@ void SerialConnection::configureTty() {
     config.c_cc[VMIN] = 1;
     config.c_cc[VTIME] = 0;
 
-    if (cfsetispeed(&config, B115200) < 0 || cfsetospeed(&config, B9600) < 0) {
+    if (cfsetispeed(&config, B115200) < 0 || cfsetospeed(&config, B115200) < 0) {
         assert(false);
     }
 
