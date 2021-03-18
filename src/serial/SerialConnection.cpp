@@ -30,6 +30,7 @@ void SerialConnection::openTty(const std::string& device) {
     // NOLINTNEXTLINE (hicpp-signed-bitwise)
     fd = open(device.c_str(), O_RDWR | O_NOCTTY | O_NDELAY);
     assert(fd != -1);  // Ensure opening was successfull
+    tcflush(fd, TCIOFLUSH);
     state = SC_OPENED;
     SPDLOG_INFO("Successfully opened serial device: {}", device);
 }
@@ -44,29 +45,18 @@ void SerialConnection::configureTty() {
     if (tcgetattr(fd, &config) < 0) {
         assert(false);
     }
-    // NOLINTNEXTLINE (hicpp-signed-bitwise)
-    config.c_iflag &= ~(IGNBRK | BRKINT | ICRNL | INLCR | PARMRK | INPCK | ISTRIP | IXON);
+
+    config.c_iflag = 0;
     config.c_oflag = 0;
-    // NOLINTNEXTLINE (hicpp-signed-bitwise)
-    config.c_lflag &= ~(ECHO | ECHONL | ICANON | IEXTEN | ISIG);
-    // Disable parity bit:
-    // NOLINTNEXTLINE (hicpp-signed-bitwise)
-    config.c_cflag &= ~(CSIZE | PARENB);
-    // Set 8 data bits:
-    // NOLINTNEXTLINE (hicpp-signed-bitwise)
-    config.c_cflag |= CS8;
-    // Set one stop bit:
-    config.c_cflag |= CSTOPB;
-
-    // One byte is enough to return from read:
-    config.c_cc[VMIN] = 1;
-    config.c_cc[VTIME] = 0;
-
+    config.c_cflag = CS8 | CREAD | CLOCAL | CSTOPB;
+    config.c_lflag = 0;
+    config.c_cc[VTIME] = static_cast<cc_t>(15);
+    config.c_cc[VMIN] = 10;
     if (cfsetispeed(&config, B115200) < 0 || cfsetospeed(&config, B115200) < 0) {
         assert(false);
     }
 
-    if (tcsetattr(fd, TCSAFLUSH, &config) < 0) {
+    if (tcsetattr(fd, TCSANOW, &config) < 0) {
         assert(false);
     }
     state = SC_READY;
