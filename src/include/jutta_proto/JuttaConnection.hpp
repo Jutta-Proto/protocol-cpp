@@ -26,12 +26,12 @@ class JuttaConnection {
      * The result will be stored in the given "byte" pointer.
      * Returns true on success.
      **/
-    bool read_decoded(uint8_t* byte);
+    [[nodiscard]] bool read_decoded(uint8_t* byte) const;
     /**
      * Reads as many data bytes, as there are availabel.
      * Each data byte consists of 4 JUTTA bytes which will be decoded into a single data byte.
      **/
-    bool read_decoded(std::vector<uint8_t>& data);
+    [[nodiscard]] bool read_decoded(std::vector<uint8_t>& data) const;
     /**
      * Waits until the coffee maker responded with a "ok:\r\n".
      * The default timeout for this operation is 5 seconds.
@@ -39,27 +39,27 @@ class JuttaConnection {
      * Returns true on success.
      * Returns false when a timeout occurred.
      **/
-    bool wait_for_ok(const std::chrono::milliseconds& timeout = std::chrono::milliseconds{5000});
+    [[nodiscard]] bool wait_for_ok(const std::chrono::milliseconds& timeout = std::chrono::milliseconds{5000}) const;
     /**
      * Flushes the read buffer.
      **/
-    void flush_read_buffer();
+    void flush_read_buffer() const;
 
     /**
      * Encodes the given byte into 4 JUTTA bytes and writes them to the coffee maker.
      **/
-    bool write_decoded(const uint8_t& byte);
+    [[nodiscard]] bool write_decoded(const uint8_t& byte) const;
     /**
      * Encodes each byte of the given bytes into 4 JUTTA bytes and writes them to the coffee maker.
      **/
-    bool write_decoded(const std::vector<uint8_t>& data);
+    [[nodiscard]] bool write_decoded(const std::vector<uint8_t>& data) const;
     /**
      * Encodes each character into 4 JUTTA bytes and writes them to the coffee maker.
      *
      * An example call could look like: write_decoded("TY:\r\n");
      * This would request the device type from the coffee maker.
      **/
-    bool write_decoded(const std::string& data);
+    [[nodiscard]] bool write_decoded(const std::string& data) const;
 
     /**
      * Helper function used for debugging.
@@ -109,17 +109,17 @@ class JuttaConnection {
     /**
      * Writes four bytes of encoded data to the coffee maker and then waits 8ms.
      **/
-    bool write_encoded(const std::array<uint8_t, 4>& encData);
+    [[nodiscard]] bool write_encoded(const std::array<uint8_t, 4>& encData) const;
     /**
      * Reads four bytes of encoded data which represent one byte of actual data.
      * Returns true on success.
      **/
-    bool read_encoded(std::array<uint8_t, 4>& buffer);
+    [[nodiscard]] bool read_encoded(std::array<uint8_t, 4>& buffer) const;
     /**
      * Reads multiples of four bytes. Every four bytes represent one actual byte.
      * Returns the number of 4 byte tuples read.
      **/
-    size_t read_encoded(std::vector<std::array<uint8_t, 4>>& data);
+    [[nodiscard]] size_t read_encoded(std::vector<std::array<uint8_t, 4>>& data) const;
 };
 //---------------------------------------------------------------------------
 }  // namespace jutta_proto

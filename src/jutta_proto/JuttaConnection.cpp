@@ -13,7 +13,7 @@ namespace jutta_proto {
 //---------------------------------------------------------------------------
 JuttaConnection::JuttaConnection(const std::string& device) : serial(device) {}
 
-bool JuttaConnection::read_decoded(uint8_t* byte) {
+bool JuttaConnection::read_decoded(uint8_t* byte) const {
     std::array<uint8_t, 4> buffer{};
     if (!read_encoded(buffer)) {
         return false;
@@ -22,7 +22,7 @@ bool JuttaConnection::read_decoded(uint8_t* byte) {
     return true;
 }
 
-bool JuttaConnection::read_decoded(std::vector<uint8_t>& data) {
+bool JuttaConnection::read_decoded(std::vector<uint8_t>& data) const {
     // Read encoded data:
     std::vector<std::array<uint8_t, 4>> dataBuffer;
     if (read_encoded(dataBuffer) <= 0) {
@@ -36,13 +36,13 @@ bool JuttaConnection::read_decoded(std::vector<uint8_t>& data) {
     return true;
 }
 
-bool JuttaConnection::write_decoded(const uint8_t& byte) { return write_encoded(encode(byte)); }
+bool JuttaConnection::write_decoded(const uint8_t& byte) const { return write_encoded(encode(byte)); }
 
-bool JuttaConnection::write_decoded(const std::vector<uint8_t>& data) {
+bool JuttaConnection::write_decoded(const std::vector<uint8_t>& data) const {
     return std::ranges::all_of(data.begin(), data.end(), [this](uint8_t byte) { return write_decoded(byte); });
 }
 
-bool JuttaConnection::write_decoded(const std::string& data) {
+bool JuttaConnection::write_decoded(const std::string& data) const {
     return std::ranges::all_of(data.begin(), data.end(), [this](char c) { return write_decoded(static_cast<uint8_t>(c)); });
 }
 
@@ -139,14 +139,14 @@ uint8_t JuttaConnection::decode(const std::array<uint8_t, 4>& encData) {
     return decData;
 }
 
-bool JuttaConnection::write_encoded(const std::array<uint8_t, 4>& encData) {
+bool JuttaConnection::write_encoded(const std::array<uint8_t, 4>& encData) const {
     bool result = serial.write_serial(encData);
     serial.flush();
     std::this_thread::sleep_for(std::chrono::milliseconds{8});
     return result;
 }
 
-bool JuttaConnection::read_encoded(std::array<uint8_t, 4>& buffer) {
+bool JuttaConnection::read_encoded(std::array<uint8_t, 4>& buffer) const {
     size_t size = serial.read_serial(buffer);
     if (size <= 0) {
         SPDLOG_TRACE("No serial data found.");
@@ -161,7 +161,7 @@ bool JuttaConnection::read_encoded(std::array<uint8_t, 4>& buffer) {
     return true;
 }
 
-size_t JuttaConnection::read_encoded(std::vector<std::array<uint8_t, 4>>& data) {
+size_t JuttaConnection::read_encoded(std::vector<std::array<uint8_t, 4>>& data) const {
     // Wait 8 ms for the next bunch of data to arrive:
     std::this_thread::sleep_for(std::chrono::milliseconds{8});
 
@@ -175,7 +175,7 @@ size_t JuttaConnection::read_encoded(std::vector<std::array<uint8_t, 4>>& data) 
     return data.size();
 }
 
-bool JuttaConnection::wait_for_ok(const std::chrono::milliseconds& timeout) {
+bool JuttaConnection::wait_for_ok(const std::chrono::milliseconds& timeout) const {
     std::vector<uint8_t> buffer;
 
     std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
@@ -194,7 +194,7 @@ bool JuttaConnection::wait_for_ok(const std::chrono::milliseconds& timeout) {
     return false;
 }
 
-void JuttaConnection::flush_read_buffer() {
+void JuttaConnection::flush_read_buffer() const {
     serial.flush_read_buffer();
 }
 

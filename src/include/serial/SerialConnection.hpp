@@ -28,16 +28,16 @@ class SerialConnection {
      * Reads at maximum four bytes.
      * Returns how many bytes have been actually read.
      **/
-    size_t read_serial(std::array<uint8_t, 4>& buffer);
+    [[nodiscard]] size_t read_serial(std::array<uint8_t, 4>& buffer) const;
     /**
      * Writes the given data buffer to the serial connection.
      **/
-    size_t write_serial(const std::array<uint8_t, 4>& data);
+    [[nodiscard]] size_t write_serial(const std::array<uint8_t, 4>& data) const;
     void flush() const;
     /**
      * Flushes the read buffer.
      **/
-    void flush_read_buffer();
+    void flush_read_buffer() const;
 
     /**
      * Returns all available serial port paths for this device.

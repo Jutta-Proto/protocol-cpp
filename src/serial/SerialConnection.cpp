@@ -73,12 +73,12 @@ SerialConnection::~SerialConnection() {
     closeTty();
 }
 
-size_t SerialConnection::read_serial(std::array<uint8_t, 4>& buffer) {
+size_t SerialConnection::read_serial(std::array<uint8_t, 4>& buffer) const {
     assert(state == SC_READY);
     return read(fd, buffer.data(), buffer.size());
 }
 
-size_t SerialConnection::write_serial(const std::array<uint8_t, 4>& data) {
+size_t SerialConnection::write_serial(const std::array<uint8_t, 4>& data) const {
     assert(state == SC_READY);
     size_t result = write(fd, data.data(), data.size());
     return result;
@@ -89,7 +89,7 @@ void SerialConnection::flush() const {
     tcdrain(fd);
 }
 
-void SerialConnection::flush_read_buffer() {
+void SerialConnection::flush_read_buffer() const {
     std::array<uint8_t, 4> buffer{};
     while (read_serial(buffer) > 0) {}
 }

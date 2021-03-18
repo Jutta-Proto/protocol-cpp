@@ -86,7 +86,7 @@ class CoffeeMaker {
     /**
      * Simulates a button press of the given button.
      **/
-    void press_button(jutta_button_t button);
+    void press_button(jutta_button_t button) const;
 
     /**
      * Returns true in case the coffee maker is locked due to it currently interacting with the coffee maker e.g. brewing a coffee.
@@ -97,20 +97,20 @@ class CoffeeMaker {
     /**
      * Returns the page number for the given coffee type.
      **/
-    size_t get_page_num(coffee_t coffee);
+    [[nodiscard]] size_t get_page_num(coffee_t coffee) const;
 
     /**
      * Returns the button number for the given coffee type.
      **/
-    jutta_button_t get_button_num(coffee_t coffee);
+    [[nodiscard]] jutta_button_t get_button_num(coffee_t coffee) const;
     /**
      * Writes the given string to the coffee maker and waits for an "ok:\r\n"
      **/
-    bool write_and_wait(const std::string& s);
+    [[nodiscard]] bool write_and_wait(const std::string& s) const;
     /**
      * Turns on the water pump and heater for the given amount of time.
      **/
-    void pump_hot_water(const std::chrono::milliseconds& waterTime);
+    void pump_hot_water(const std::chrono::milliseconds& waterTime) const;
 };
 //---------------------------------------------------------------------------
 }  // namespace jutta_proto
