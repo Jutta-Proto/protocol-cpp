@@ -1,7 +1,7 @@
 #include "serial/SerialConnection.hpp"
+#include "logger/Logger.hpp"
 #include <cassert>
 #include <cstddef>
-#include <iostream>
 #include <sstream>
 
 extern "C" {
@@ -31,7 +31,7 @@ void SerialConnection::openTty(const std::string& device) {
     fd = open(device.c_str(), O_RDWR | O_NOCTTY | O_NDELAY);
     assert(fd != -1);  // Ensure opening was successfull
     state = SC_OPENED;
-    std::cout << "Successfully opened serial device: " << device << '\n';
+    SPDLOG_INFO("Successfully opened serial device: {}", device);
 }
 
 void SerialConnection::configureTty() {
@@ -70,12 +70,13 @@ void SerialConnection::configureTty() {
         assert(false);
     }
     state = SC_READY;
-    std::cout << "Successfully configured serial device\n";
+    SPDLOG_INFO("Successfully configured serial device.");
 }
 
 void SerialConnection::closeTty() {
     close(fd);
     state = SC_DISABLED;
+    SPDLOG_INFO("Serial device closed.");
 }
 
 SerialConnection::~SerialConnection() {

@@ -2,22 +2,22 @@
 
 #include <cassert>
 #include <iomanip>
-#include <iostream>
 #include <limits>
 #include <string>
 #include <thread>
+#include "logger/Logger.hpp"
 
 #include "jutta_proto/JuttaCommands.hpp"
 
 //---------------------------------------------------------------------------
 namespace jutta_proto {
 //---------------------------------------------------------------------------
-CoffeeMaker::CoffeeMaker() : connection("SOME PORT") {}
+CoffeeMaker::CoffeeMaker() : connection("/dev/ttyS1") {}
 
 // NOLINTNEXTLINE (readability-convert-member-functions-to-static)
 void CoffeeMaker::init() {
-    std::cout << "Initializing coffee maker...\n";
-    std::cout << "Coffee maker initialized.\n";
+    SPDLOG_INFO("Initializing coffee maker...");
+    SPDLOG_INFO("Coffee maker initialized.");
 }
 
 void CoffeeMaker::switch_page() {
@@ -108,24 +108,23 @@ void CoffeeMaker::press_button(jutta_button_t button) {
 void CoffeeMaker::brew_custom_coffee(const std::chrono::milliseconds& grindTime, const std::chrono::milliseconds& waterTime) {
     assert(!locked);
     locked = true;
-
-    std::cout << "Brewing custom coffee with " << std::to_string(grindTime.count()) << " ms grind time and " << std::to_string(waterTime.count()) << " ms water time...\n";
+    SPDLOG_INFO("Brewing custom coffee with {} ms grind time and {} ms ms water time...", std::to_string(grindTime.count()), std::to_string(waterTime.count()));
 
     // Grind:
-    std::cout << "Custom coffee grinding...\n";
+    SPDLOG_INFO("Custom coffee grinding...");
     write_and_wait(JUTTA_GRINDER_ON);
     std::this_thread::sleep_for(grindTime);
     write_and_wait(JUTTA_GRINDER_OFF);
     write_and_wait(JUTTA_BREW_GROUP_TO_BREWING_POSITION);
 
     // Compress:
-    std::cout << "Custom coffee compressing...\n";
+    SPDLOG_INFO("Custom coffee compressing...");
     write_and_wait(JUTTA_COFFEE_PRESS_ON);
     std::this_thread::sleep_for(std::chrono::milliseconds{500});
     write_and_wait(JUTTA_COFFEE_PRESS_OFF);
 
     // Brew step 1:
-    std::cout << "Custom coffee brewing...\n";
+    SPDLOG_INFO("Custom coffee brewing...");
     write_and_wait(JUTTA_COFFEE_WATER_PUMP_ON);
     std::this_thread::sleep_for(std::chrono::milliseconds{2000});
     write_and_wait(JUTTA_COFFEE_WATER_PUMP_OFF);
@@ -135,9 +134,9 @@ void CoffeeMaker::brew_custom_coffee(const std::chrono::milliseconds& grindTime,
     pump_hot_water(waterTime);
 
     // Reset:
-    std::cout << "Custom coffee finishing up...\n";
+    SPDLOG_INFO("Custom coffee finishing up...");
     write_and_wait(JUTTA_BREW_GROUP_RESET);
-    std::cout << "Custom coffee done.\n";
+    SPDLOG_INFO("Custom coffee done.");
 
     locked = false;
 }
@@ -154,10 +153,10 @@ void CoffeeMaker::pump_hot_water(const std::chrono::milliseconds& waterTime) {
     // NOLINTNEXTLINE (hicpp-use-nullptr, modernize-use-nullptr)
     while (std::chrono::steady_clock::now() < end) {
         write_and_wait(JUTTA_COFFEE_WATER_HEATER_ON);
-        std::cout << "Heater turned on.\n";
+        SPDLOG_INFO("Heater turned on.");
         std::this_thread::sleep_for(waterTime / 8);
         write_and_wait(JUTTA_COFFEE_WATER_HEATER_OFF);
-        std::cout << "Heater turned off.\n";
+        SPDLOG_INFO("Heater turned off.");
         std::this_thread::sleep_for(waterTime / 20);
     }
     write_and_wait(JUTTA_COFFEE_WATER_PUMP_OFF);

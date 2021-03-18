@@ -4,9 +4,9 @@
 #include <cassert>
 #include <cstddef>
 #include <cstdio>
-#include <iostream>
 #include <string>
 #include <thread>
+#include <spdlog/spdlog.h>
 
 //---------------------------------------------------------------------------
 namespace jutta_proto {
@@ -48,7 +48,7 @@ bool JuttaConnection::write_decoded(const std::string& data) {
 
 void JuttaConnection::print_byte(const uint8_t& byte) {
     for (size_t i = 0; i < 8; i++) {
-        std::cout << ((byte >> (7 - i)) & 0b00000001) << " ";
+        SPDLOG_INFO("{} ", ((byte >> (7 - i)) & 0b00000001));
     }
     // printf("-> %d\t%02x\t%c", byte, byte, byte);
     printf("-> %d\t%02x", byte, byte);
@@ -57,9 +57,7 @@ void JuttaConnection::print_byte(const uint8_t& byte) {
 void JuttaConnection::print_bytes(const std::vector<uint8_t>& data) {
     for (const uint8_t& byte : data) {
         print_byte(byte);
-        std::cout << "\r\n";
     }
-    std::cout << "\r\n";
 }
 
 void JuttaConnection::run_encode_decode_test() {
@@ -68,25 +66,22 @@ void JuttaConnection::run_encode_decode_test() {
     for (uint16_t i = 0b00000000; i <= 0b11111111; i++) {
         if (i != decode(encode(i))) {
             success = false;
-            std::cout << "data: ";
+            SPDLOG_ERROR("data:");
             print_byte(i);
-            std::cout << "\n";
 
             std::array<uint8_t, 4> dataEnc = encode(i);
             for (size_t i = 0; i < 4; i++) {
-                std::cout << "dataEnc[" << i << "]: ";
+                SPDLOG_ERROR("dataEnc[{}]", i);
                 print_byte(dataEnc.at(i));
-                std::cout << "\n";
             }
 
             uint8_t dataDec = decode(dataEnc);
-            std::cout << "dataDec: ";
+            SPDLOG_ERROR("dataDec:");
             print_byte(dataDec);
-            std::cout << "\n";
         }
     }
     // Flush the stdout to ensure the result gets printed when assert(success) fails:
-    std::cout << "Encode decode test: " << success << std::endl;
+    SPDLOG_INFO("Encode decode test: {}", success);
     assert(success);
 }
 
@@ -157,7 +152,7 @@ bool JuttaConnection::read_encoded(std::array<uint8_t, 4>& buffer) {
         return false;
     }
     if (size < 4) {
-        std::cerr << "Invalid amount of UART data found (" << size << " byte) - flushing.\n";
+        SPDLOG_ERROR("Invalid amount of UART data found ({} byte) - flushing.", size);
         flush_read_buffer();
         return false;
     }
