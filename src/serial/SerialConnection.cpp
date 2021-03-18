@@ -49,10 +49,14 @@ void SerialConnection::configureTty() {
     config.c_oflag = 0;
     // NOLINTNEXTLINE (hicpp-signed-bitwise)
     config.c_lflag &= ~(ECHO | ECHONL | ICANON | IEXTEN | ISIG);
+    // Disable parity bit:
     // NOLINTNEXTLINE (hicpp-signed-bitwise)
     config.c_cflag &= ~(CSIZE | PARENB);
+    // Set 8 data bits:
     // NOLINTNEXTLINE (hicpp-signed-bitwise)
     config.c_cflag |= CS8;
+    // Set one stop bit:
+    config.c_cflag |= CSTOPB;
 
     // One byte is enough to return from read:
     config.c_cc[VMIN] = 1;
