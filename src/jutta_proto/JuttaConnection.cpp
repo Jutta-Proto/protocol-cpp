@@ -4,6 +4,7 @@
 #include <cassert>
 #include <cstddef>
 #include <cstdio>
+#include <sstream>
 #include <string>
 #include <thread>
 #include <spdlog/spdlog.h>
@@ -191,6 +192,18 @@ bool JuttaConnection::wait_for_ok(const std::chrono::milliseconds& timeout) cons
         std::this_thread::sleep_for(std::chrono::milliseconds{250});
     }
     return false;
+}
+
+std::string JuttaConnection::vec_to_string(const std::vector<uint8_t>& data) {
+    if (data.empty()) {
+        return "";
+    }
+
+    std::ostringstream sstream;
+    for (unsigned char i : data) {
+        sstream << static_cast<char>(i);
+    }
+    return sstream.str();
 }
 
 //---------------------------------------------------------------------------
