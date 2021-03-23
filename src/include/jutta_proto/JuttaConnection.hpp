@@ -85,6 +85,11 @@ class JuttaConnection {
      **/
     static void run_encode_decode_test();
 
+    /**
+     * Converts the given binary vector to a string and returns it.
+     **/
+    static std::string vec_to_string(const std::vector<uint8_t>& data);
+
  private:
     /**
      * Encodes the given byte into four bytes that the coffee maker understands.
@@ -116,11 +121,6 @@ class JuttaConnection {
      * Returns the number of 4 byte tuples read.
      **/
     [[nodiscard]] size_t read_encoded(std::vector<std::array<uint8_t, 4>>& data) const;
-
-    /**
-     * Converts the given binary vector to a string and returns it.
-     **/
-    static std::string vec_to_string(const std::vector<uint8_t>& data);
 };
 //---------------------------------------------------------------------------
 }  // namespace jutta_proto
