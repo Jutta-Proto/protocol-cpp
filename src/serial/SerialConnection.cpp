@@ -48,7 +48,7 @@ void SerialConnection::configureTty() {
 
     config.c_iflag = 0;
     config.c_oflag = 0;
-    config.c_cflag = CS8 | CREAD | CLOCAL | CSTOPB;
+    config.c_cflag = CS8 | CREAD | CLOCAL;
     config.c_lflag = 0;
     /**
      * Max time in tenth of seconds between characters allowed.
