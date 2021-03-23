@@ -142,7 +142,6 @@ void CoffeeMaker::brew_custom_coffee(const std::chrono::milliseconds& grindTime,
 }
 
 bool CoffeeMaker::write_and_wait(const std::string& s) const {
-    connection.flush_read_buffer();
     static_cast<void>(connection.write_decoded(s));
     return connection.wait_for_ok();
 }

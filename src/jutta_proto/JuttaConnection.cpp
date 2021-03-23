@@ -148,13 +148,12 @@ bool JuttaConnection::write_encoded(const std::array<uint8_t, 4>& encData) const
 
 bool JuttaConnection::read_encoded(std::array<uint8_t, 4>& buffer) const {
     size_t size = serial.read_serial(buffer);
-    if (size <= 0) {
+    if (size <= 0 || size > 4) {
         SPDLOG_TRACE("No serial data found.");
         return false;
     }
     if (size < 4) {
-        SPDLOG_WARN("Invalid amount of UART data found ({} byte) - flushing.", size);
-        flush_read_buffer();
+        SPDLOG_WARN("Invalid amount of UART data found ({} byte) - ignoring.", size);
         return false;
     }
     SPDLOG_TRACE("Read 4 encoded bytes.");
@@ -192,10 +191,6 @@ bool JuttaConnection::wait_for_ok(const std::chrono::milliseconds& timeout) cons
         std::this_thread::sleep_for(std::chrono::milliseconds{250});
     }
     return false;
-}
-
-void JuttaConnection::flush_read_buffer() const {
-    serial.flush_read_buffer();
 }
 
 //---------------------------------------------------------------------------

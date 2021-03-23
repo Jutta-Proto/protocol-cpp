@@ -40,10 +40,6 @@ class JuttaConnection {
      * Returns false when a timeout occurred.
      **/
     [[nodiscard]] bool wait_for_ok(const std::chrono::milliseconds& timeout = std::chrono::milliseconds{5000}) const;
-    /**
-     * Flushes the read buffer.
-     **/
-    void flush_read_buffer() const;
 
     /**
      * Encodes the given byte into 4 JUTTA bytes and writes them to the coffee maker.

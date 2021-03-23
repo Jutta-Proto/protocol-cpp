@@ -50,9 +50,19 @@ void SerialConnection::configureTty() {
     config.c_oflag = 0;
     config.c_cflag = CS8 | CREAD | CLOCAL | CSTOPB;
     config.c_lflag = 0;
-    config.c_cc[VTIME] = static_cast<cc_t>(15);
-    config.c_cc[VMIN] = 10;
-    if (cfsetispeed(&config, B115200) < 0 || cfsetospeed(&config, B115200) < 0) {
+    /**
+     * Max time in tenth of seconds between characters allowed.
+     * We abuse this since the coffee maker will make a 8ms break between each byte it sends.
+     * For fail save reasons we allow 2 ms between the individual bytes.
+     * http://unixwiz.net/techtips/termios-vmin-vtime.html
+     **/
+    config.c_cc[VTIME] = 2;
+    /**
+     * Number of characters have been received, with no more data available.
+     * http://unixwiz.net/techtips/termios-vmin-vtime.html
+     **/
+    config.c_cc[VMIN] = 4;
+    if (cfsetispeed(&config, B9600) < 0 || cfsetospeed(&config, B9600) < 0) {
         assert(false);
     }
 
@@ -87,11 +97,6 @@ size_t SerialConnection::write_serial(const std::array<uint8_t, 4>& data) const 
 void SerialConnection::flush() const {
     // Wait until everything has been send:
     tcdrain(fd);
-}
-
-void SerialConnection::flush_read_buffer() const {
-    std::array<uint8_t, 4> buffer{};
-    while (read_serial(buffer) > 0) {}
 }
 
 std::vector<std::string> SerialConnection::get_available_ports() {
