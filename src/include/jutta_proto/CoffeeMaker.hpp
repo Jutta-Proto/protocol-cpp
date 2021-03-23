@@ -59,9 +59,11 @@ class CoffeeMaker {
     CoffeeMaker();
 
     /**
-     * Initializes UART and coffee maker connection.
+     * Tries to initializes the coffee maker serial (UART) connection.
+     * Throws a exception in case something goes wrong.
      **/
     void init();
+
     /**
      * Switches to the next page.
      * 0 -> 1

@@ -2,7 +2,10 @@
 #include "logger/Logger.hpp"
 #include <cassert>
 #include <cstddef>
+#include <exception>
 #include <sstream>
+#include <stdexcept>
+#include <system_error>
 
 extern "C" {
 #include <fcntl.h>
@@ -14,8 +17,14 @@ extern "C" {
 //---------------------------------------------------------------------------
 namespace serial {
 //---------------------------------------------------------------------------
-SerialConnection::SerialConnection(const std::string& device) {
-    assert(state == SC_DISABLED || state == SC_ERROR);
+SerialConnection::SerialConnection(std::string&& device) : device(std::move(device)) {}
+
+SerialConnection::~SerialConnection() {
+    closeTty();
+}
+
+void SerialConnection::init() {
+    assert(state == SC_DISABLED);
     openTty(device);
     configureTty();
     assert(state == SC_READY);
@@ -29,7 +38,9 @@ void SerialConnection::openTty(const std::string& device) {
     // O_NDELAY - Use non-blocking I/O.
     // NOLINTNEXTLINE (hicpp-signed-bitwise)
     fd = open(device.c_str(), O_RDWR | O_NOCTTY | O_NDELAY);
-    assert(fd != -1);  // Ensure opening was successfull
+    if (fd < 0) {
+        throw std::runtime_error("Failed to open '" + device + "' with: " + strerror(errno));
+    }
     tcflush(fd, TCIOFLUSH);
     state = SC_OPENED;
     SPDLOG_INFO("Successfully opened serial device: {}", device);
@@ -39,11 +50,13 @@ void SerialConnection::configureTty() {
     assert(state == SC_OPENED);
     assert(fd != -1);  // Ensure opening was successfull
     // Ensure the device is a TTY:
-    assert(isatty(fd));
+    if (isatty(fd)) {
+        throw std::runtime_error("Failed to configure '" + device + "'. The device is no TTY.");
+    }
 
     termios config{};
     if (tcgetattr(fd, &config) < 0) {
-        assert(false);
+        throw std::runtime_error("Failed to get configuration for '" + device + "' with: " + strerror(errno));
     }
 
     config.c_iflag = 0;
@@ -63,24 +76,23 @@ void SerialConnection::configureTty() {
      **/
     config.c_cc[VMIN] = 4;
     if (cfsetispeed(&config, B9600) < 0 || cfsetospeed(&config, B9600) < 0) {
-        assert(false);
+        throw std::runtime_error("Failed to set the baud rate for '" + device + "' with: " + strerror(errno));
     }
 
     if (tcsetattr(fd, TCSANOW, &config) < 0) {
-        assert(false);
+        throw std::runtime_error("Failed to set configuration for '" + device + "' with: " + strerror(errno));
     }
     state = SC_READY;
     SPDLOG_INFO("Successfully configured serial device.");
 }
 
 void SerialConnection::closeTty() {
-    close(fd);
-    state = SC_DISABLED;
-    SPDLOG_INFO("Serial device closed.");
-}
-
-SerialConnection::~SerialConnection() {
-    closeTty();
+    if (state != SC_DISABLED) {
+        close(fd);
+        fd = -1;
+        SPDLOG_INFO("Serial device closed.");
+        state = SC_DISABLED;
+    }
 }
 
 size_t SerialConnection::read_serial(std::array<uint8_t, 4>& buffer) const {

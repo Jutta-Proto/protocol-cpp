@@ -17,12 +17,19 @@ enum SerialConnectionState { SC_DISABLED = 0,
  **/
 class SerialConnection {
  private:
+    const std::string device;
     int fd = -1;
     SerialConnectionState state{SC_DISABLED};
 
  public:
-    explicit SerialConnection(const std::string& device);
+    explicit SerialConnection(std::string&& device);
     ~SerialConnection();
+
+    /**
+     * Tries to initializes the serial (UART) connection.
+     * Throws a exception in case something goes wrong.
+     **/
+    void init();
 
     /**
      * Reads at maximum four bytes.
@@ -41,7 +48,15 @@ class SerialConnection {
     static std::vector<std::string> get_available_ports();
 
  private:
+    /**
+     * Tries to open the given serial port and stores the resulting file descriptor in fd.
+     * Throws a exception in case something goes wrong.
+     **/
     void openTty(const std::string& device);
+    /**
+     * Tries to configure the current file descriptor fd as serial (UART) device.
+     * Throws a exception in case something goes wrong.
+     **/
     void configureTty();
     void closeTty();
 };

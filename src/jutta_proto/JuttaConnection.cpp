@@ -12,7 +12,11 @@
 //---------------------------------------------------------------------------
 namespace jutta_proto {
 //---------------------------------------------------------------------------
-JuttaConnection::JuttaConnection(const std::string& device) : serial(device) {}
+JuttaConnection::JuttaConnection(std::string&& device) : serial(std::move(device)) {}
+
+void JuttaConnection::init() {
+    serial.init();
+}
 
 bool JuttaConnection::read_decoded(uint8_t* byte) const {
     std::array<uint8_t, 4> buffer{};

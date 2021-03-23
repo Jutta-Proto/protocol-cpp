@@ -18,7 +18,13 @@ class JuttaConnection {
     /**
      * Initializes a new Jutta (UART) connection.
      **/
-    explicit JuttaConnection(const std::string& device);
+    explicit JuttaConnection(std::string&& device);
+
+    /**
+     * Tries to initializes the Jutta serial (UART) connection.
+     * Throws a exception in case something goes wrong.
+     **/
+    void init();
 
     /**
      * Tries to read a single decoded byte.

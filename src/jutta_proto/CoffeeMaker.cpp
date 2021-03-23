@@ -17,6 +17,7 @@ CoffeeMaker::CoffeeMaker() : connection("/dev/ttyS1") {}
 // NOLINTNEXTLINE (readability-convert-member-functions-to-static)
 void CoffeeMaker::init() {
     SPDLOG_INFO("Initializing coffee maker...");
+    connection.init();
     SPDLOG_INFO("Coffee maker initialized.");
 }
 
