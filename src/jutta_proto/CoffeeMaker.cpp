@@ -12,7 +12,7 @@
 //---------------------------------------------------------------------------
 namespace jutta_proto {
 //---------------------------------------------------------------------------
-CoffeeMaker::CoffeeMaker(JuttaConnection&& connection) : connection(std::move(connection)) {}
+CoffeeMaker::CoffeeMaker(std::unique_ptr<JuttaConnection>&& connection) : connection(std::move(connection)) {}
 
 void CoffeeMaker::switch_page() {
     press_button(jutta_button_t::BUTTON_6);
@@ -136,8 +136,8 @@ void CoffeeMaker::brew_custom_coffee(const std::chrono::milliseconds& grindTime,
 }
 
 bool CoffeeMaker::write_and_wait(const std::string& s) const {
-    static_cast<void>(connection.write_decoded(s));
-    return connection.wait_for_ok();
+    static_cast<void>(connection->write_decoded(s));
+    return connection->wait_for_ok();
 }
 
 void CoffeeMaker::pump_hot_water(const std::chrono::milliseconds& waterTime) const {

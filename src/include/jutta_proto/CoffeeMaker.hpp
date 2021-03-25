@@ -2,6 +2,7 @@
 
 #include <chrono>
 #include <map>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -32,7 +33,7 @@ class CoffeeMaker {
         BUTTON_6 = 6,
     };
 
-    JuttaConnection connection;
+    std::unique_ptr<JuttaConnection> connection;
 
  private:
     static constexpr size_t NUM_PAGES = 2;
@@ -59,7 +60,7 @@ class CoffeeMaker {
     /**
      * Takes an initialized JuttaConnection.
      **/
-    explicit CoffeeMaker(JuttaConnection&& connection);
+    explicit CoffeeMaker(std::unique_ptr<JuttaConnection>&& connection);
 
     /**
      * Switches to the next page.
