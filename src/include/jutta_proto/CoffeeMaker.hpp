@@ -56,13 +56,10 @@ class CoffeeMaker {
     bool locked{false};
 
  public:
-    CoffeeMaker();
-
     /**
-     * Tries to initializes the coffee maker serial (UART) connection.
-     * Throws a exception in case something goes wrong.
+     * Takes an initialized JuttaConnection.
      **/
-    void init();
+    explicit CoffeeMaker(JuttaConnection&& connection);
 
     /**
      * Switches to the next page.

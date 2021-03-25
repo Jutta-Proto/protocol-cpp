@@ -12,14 +12,7 @@
 //---------------------------------------------------------------------------
 namespace jutta_proto {
 //---------------------------------------------------------------------------
-CoffeeMaker::CoffeeMaker() : connection("/dev/ttyS1") {}
-
-// NOLINTNEXTLINE (readability-convert-member-functions-to-static)
-void CoffeeMaker::init() {
-    SPDLOG_INFO("Initializing coffee maker...");
-    connection.init();
-    SPDLOG_INFO("Coffee maker initialized.");
-}
+CoffeeMaker::CoffeeMaker(JuttaConnection&& connection) : connection(std::move(connection)) {}
 
 void CoffeeMaker::switch_page() {
     press_button(jutta_button_t::BUTTON_6);
