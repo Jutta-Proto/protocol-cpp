@@ -166,13 +166,14 @@ bool JuttaConnection::read_encoded(std::array<uint8_t, 4>& buffer) const {
 }
 
 size_t JuttaConnection::read_encoded(std::vector<std::array<uint8_t, 4>>& data) const {
-    // Wait 8 ms for the next bunch of data to arrive:
-    std::this_thread::sleep_for(std::chrono::milliseconds{8});
-
     while (true) {
         std::array<uint8_t, 4> buffer{};
         if (!read_encoded(buffer)) {
-            break;
+            // Wait 100 ms for the next bunch of data to arrive:
+            std::this_thread::sleep_for(std::chrono::milliseconds{100});
+            if (!read_encoded(buffer)) {
+                break;
+            }
         }
         data.push_back(buffer);
     }
