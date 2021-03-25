@@ -50,7 +50,7 @@ void SerialConnection::configureTty() {
     assert(state == SC_OPENED);
     assert(fd != -1);  // Ensure opening was successfull
     // Ensure the device is a TTY:
-    if (isatty(fd)) {
+    if (!isatty(fd)) {
         throw std::runtime_error("Failed to configure '" + device + "'. The device is no TTY.");
     }
 
