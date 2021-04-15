@@ -81,8 +81,10 @@ class CoffeeMaker {
      * Brews a custom coffee with the given grind and water times.
      * A default coffee on a JUTTA E6 (2019) grinds for 3.6 seconds and then lets the water run for 40 seconds (200 ml).
      * This corresponds to a water flow rate of 5 ml/s.
+     * As long as cancel is set to true, the process will continue.
+     * In case it changes from true to false, the coffee maker will cancel brewing and will reset the coffee maker to it's default state before returning.
      **/
-    void brew_custom_coffee(const std::chrono::milliseconds& grindTime = std::chrono::milliseconds{3600}, const std::chrono::milliseconds& waterTime = std::chrono::milliseconds{40000});
+    void brew_custom_coffee(const bool* cancel, const std::chrono::milliseconds& grindTime = std::chrono::milliseconds{3600}, const std::chrono::milliseconds& waterTime = std::chrono::milliseconds{40000});
     /**
      * Simulates a button press of the given button.
      **/
@@ -109,8 +111,21 @@ class CoffeeMaker {
     [[nodiscard]] bool write_and_wait(const std::string& s) const;
     /**
      * Turns on the water pump and heater for the given amount of time.
+     * As long as cancel is set to true, the process will continue.
+     * In case it changes from true to false, the coffee maker will cancel pumping returns.
+     *
+     * Returns true in case pumping was successfull and has not returned early.
      **/
-    void pump_hot_water(const std::chrono::milliseconds& waterTime) const;
+    bool pump_hot_water(const std::chrono::milliseconds& waterTime, const bool* cancel) const;
+
+    /**
+     * Tries to sleep the given amount of milliseconds before returning.
+     * In case cancel will be set to true, the sleep will return after roughly 100ms
+     * Since the check happens every <= 100ms.
+     *
+     * Returns true in case the sleep was successfull and has not returned early.
+     **/
+    static bool sleep_cancelable(const std::chrono::milliseconds& time, const bool* cancel);
 };
 //---------------------------------------------------------------------------
 }  // namespace jutta_proto
