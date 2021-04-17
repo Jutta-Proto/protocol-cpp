@@ -1,9 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
 
-set(LOGGER_SOURCES Logger.cpp)
-
-add_library(logger SHARED ${LOGGER_SOURCES})
-target_link_libraries(logger PUBLIC CONAN_PKG::spdlog)
+add_library(logger SHARED Logger.cpp)
+target_link_libraries(logger PUBLIC spdlog)
 
 set(LOG_LEVEL Default CACHE STRING "Sets the build type")
 set_property(CACHE LOG_LEVEL PROPERTY STRINGS Default Trace Debug Info Warn Error Critical Off)

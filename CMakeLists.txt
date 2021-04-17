@@ -15,7 +15,9 @@ option(CMAKE_UNITY_BUILD "Enable unity build" OFF)
 option(ENABLE_LINTING "Enables linting while building" ON)
 option(BUILD_TESTING "Build tests" OFF)
 
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_BINARY_DIR})
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
+list(APPEND CMAKE_PREFIX_PATH ${CMAKE_BINARY_DIR})
 
 include(GNUInstallDirs)
 include(sanitizer)
@@ -48,13 +50,19 @@ else ()
     endforeach()  
 endif()
 
-if (NOT EXISTS "${CMAKE_BINARY_DIR}/conan.cmake")
-   message(STATUS "Downloading conan.cmake from https://github.com/conan-io/cmake-conan")
-   file(DOWNLOAD "https://github.com/conan-io/cmake-conan/raw/v0.15/conan.cmake"
-                 "${CMAKE_BINARY_DIR}/conan.cmake")
+if(NOT EXISTS "${CMAKE_BINARY_DIR}/conan.cmake")
+  message(STATUS "Downloading conan.cmake from https://github.com/conan-io/cmake-conan")
+  file(DOWNLOAD "https://raw.githubusercontent.com/conan-io/cmake-conan/v0.16.1/conan.cmake"
+                "${CMAKE_BINARY_DIR}/conan.cmake"
+                EXPECTED_HASH SHA256=396e16d0f5eabdc6a14afddbcfff62a54a7ee75c6da23f32f7a31bc85db23484
+                TLS_VERIFY ON)
 endif()
 
 include(${CMAKE_BINARY_DIR}/conan.cmake)
+
+conan_cmake_configure(REQUIRES catch2/2.13.4
+                               spdlog/1.8.5
+                      GENERATORS cmake_find_package)
 
 set(CONAN_CONFIGS"Release;Debug;RelWithDebInfo")
 if(NOT CMAKE_BUILD_TYPE IN_LIST CONAN_CONFIGS)
@@ -63,15 +71,15 @@ else()
     set(CONAN_BUILD_TYPE ${CMAKE_BUILD_TYPE})
 endif()
 
-conan_cmake_run(REQUIRES catch2/2.13.3
-                         spdlog/1.8.0
-                SETTINGS compiler.cppstd=${CMAKE_CXX_STANDARD}
-                         os=${CMAKE_SYSTEM_NAME}
-                OPTIONS  spdlog:header_only=False
-                BUILD    missing
-                BUILD_TYPE ${CONAN_BUILD_TYPE})
+conan_cmake_autodetect(settings)
 
-conan_basic_setup(TARGETS NO_OUTPUT_DIRS)
+conan_cmake_install(PATH_OR_REFERENCE .
+                    BUILD missing
+                    REMOTE conan-center
+                    SETTINGS ${settings})
+
+find_package(spdlog REQUIRED)
+find_package(Catch2 REQUIRED)
 
 include_directories(${CMAKE_SOURCE_DIR}/src)
 
