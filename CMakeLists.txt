@@ -11,9 +11,23 @@ set(VERSION_NAME "dev")
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-option(CMAKE_UNITY_BUILD "Enable unity build" OFF)
-option(ENABLE_LINTING "Enables linting while building" ON)
-option(BUILD_TESTING "Build tests" OFF)
+macro(jutta_proto_option OPTION_NAME OPTION_TEXT OPTION_DEFAULT)
+    option(${OPTION_NAME} ${OPTION_TEXT} ${OPTION_DEFAULT})
+    if(DEFINED ENV{${OPTION_NAME}})
+        # Allow setting the option through an environment variable
+        set(${OPTION_NAME} $ENV{${OPTION_NAME}})
+    endif()
+    if(${OPTION_NAME})
+        add_definitions(-D${OPTION_NAME})
+    endif()
+    message(STATUS "  ${OPTION_NAME}: ${${OPTION_NAME}}")
+endmacro()
+
+message(STATUS "C++ Jutta Protocol Library Options")
+message(STATUS "=======================================================")
+jutta_proto_option(JUTTA_PROTO_BUILD_TESTS "Set to ON to build tests." ON)
+jutta_proto_option(JUTTA_ENABLE_LINTING "Set to ON to enable clang linting." ON)
+message(STATUS "=======================================================")
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_BINARY_DIR})
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
@@ -23,7 +37,7 @@ include(GNUInstallDirs)
 include(sanitizer)
 include(gcc_analyze)
 
-if (${ENABLE_LINTING})
+if (${JUTTA_ENABLE_LINTING})
     message(STATUS "Enabling linting")
     include(clang-tidy)
 else()
@@ -78,15 +92,15 @@ conan_cmake_install(PATH_OR_REFERENCE .
                     REMOTE conan-center
                     SETTINGS ${settings})
 
-find_package(spdlog REQUIRED)
 find_package(Catch2 REQUIRED)
+find_package(spdlog REQUIRED)
 
 include_directories(${CMAKE_SOURCE_DIR}/src)
 
 add_subdirectory(src)
 
 # Testing
-if(${BUILD_TESTING})
+if(${JUTTA_PROTO_BUILD_TESTS})
     message(STATUS "Testing is enabled")
     enable_testing()
     add_subdirectory(tests)
