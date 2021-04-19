@@ -77,7 +77,8 @@ include(${CMAKE_BINARY_DIR}/conan.cmake)
 
 conan_cmake_configure(REQUIRES catch2/2.13.4
                                spdlog/1.8.5
-                      GENERATORS cmake_find_package)
+                      GENERATORS cmake_find_package
+                      BUILD missing)
 
 set(CONAN_CONFIGS"Release;Debug;RelWithDebInfo")
 if(NOT CMAKE_BUILD_TYPE IN_LIST CONAN_CONFIGS)
