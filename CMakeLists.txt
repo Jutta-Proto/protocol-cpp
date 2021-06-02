@@ -75,7 +75,7 @@ endif()
 
 include(${CMAKE_BINARY_DIR}/conan.cmake)
 
-conan_cmake_configure(REQUIRES catch2/2.13.4
+conan_cmake_configure(REQUIRES catch2/2.13.6
                                spdlog/1.8.5
                       GENERATORS cmake_find_package
                       BUILD missing)
@@ -94,7 +94,6 @@ conan_cmake_install(PATH_OR_REFERENCE .
                     REMOTE conan-center
                     SETTINGS ${settings})
 
-find_package(Catch2 REQUIRED)
 find_package(spdlog REQUIRED)
 
 include_directories(${CMAKE_SOURCE_DIR}/src)
