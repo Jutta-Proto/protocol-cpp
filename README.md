@@ -201,7 +201,7 @@ The following list of commands has been tested on an `Jura E6 2019 platin (15326
 | UNKNOWN | `FN:81` | `ok:` | - |
 | UNKNOWN | `FN:88` | `ok:` | - |
 | UNKNOWN | `FN:89` | `ok:` | - |
-| Debug mode on | `FN:8A` | `ku:`, `Ku:` pause `ku:`, `Ku:`, ... | Enables the debug mode. Sends continuously `ku:`, `Ku:`, ... Once an action like opening the hot water valve accrues, outputs information like percentage done. To disable it again disconnect the coffee maker from power.  |
+| Debug mode on | `FN:89` | `ku:`, `Ku:` pause `ku:`, `Ku:`, ... | Enables the debug mode. Sends continuously `ku:`, `Ku:`, ... Once an action like opening the hot water valve accrues, outputs information like percentage done. To disable it again disconnect the coffee maker from power.  |
 | UNKNOWN | `FN:90` | `ok:` | - |
 | UNKNOWN | `FN:99` | `ok:` | - |
 
