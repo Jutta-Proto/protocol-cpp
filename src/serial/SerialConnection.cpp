@@ -66,7 +66,7 @@ void SerialConnection::configureTty() {
     /**
      * Max time in tenth of seconds between characters allowed.
      * We abuse this since the coffee maker will make a 8ms break between each byte it sends.
-     * For fail save reasons we allow 2 ms between the individual bytes.
+     * For fail safe reasons we allow 2 ms between the individual bytes.
      * http://unixwiz.net/techtips/termios-vmin-vtime.html
      **/
     config.c_cc[VTIME] = 2;

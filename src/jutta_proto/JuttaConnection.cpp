@@ -15,22 +15,38 @@ namespace jutta_proto {
 JuttaConnection::JuttaConnection(std::string&& device) : serial(std::move(device)) {}
 
 void JuttaConnection::init() {
+    actionLock.lock();
     serial.init();
+    actionLock.unlock();
 }
 
-bool JuttaConnection::read_decoded(uint8_t* byte) const {
+bool JuttaConnection::read_decoded(std::vector<uint8_t>& data) {
+    actionLock.lock();
+    bool result = read_decoded_unsafe(data);
+    actionLock.unlock();
+    return result;
+}
+
+bool JuttaConnection::read_decoded(uint8_t* byte) {
+    actionLock.lock();
+    bool result = read_decoded_unsafe(byte);
+    actionLock.unlock();
+    return result;
+}
+
+bool JuttaConnection::read_decoded_unsafe(uint8_t* byte) const {
     std::array<uint8_t, 4> buffer{};
-    if (!read_encoded(buffer)) {
+    if (!read_encoded_unsafe(buffer)) {
         return false;
     }
     *byte = decode(buffer);
     return true;
 }
 
-bool JuttaConnection::read_decoded(std::vector<uint8_t>& data) const {
+bool JuttaConnection::read_decoded_unsafe(std::vector<uint8_t>& data) const {
     // Read encoded data:
     std::vector<std::array<uint8_t, 4>> dataBuffer;
-    if (read_encoded(dataBuffer) <= 0) {
+    if (read_encoded_unsafe(dataBuffer) <= 0) {
         return false;
     }
 
@@ -41,14 +57,37 @@ bool JuttaConnection::read_decoded(std::vector<uint8_t>& data) const {
     return true;
 }
 
-bool JuttaConnection::write_decoded(const uint8_t& byte) const { return write_encoded(encode(byte)); }
-
-bool JuttaConnection::write_decoded(const std::vector<uint8_t>& data) const {
-    return std::ranges::all_of(data.begin(), data.end(), [this](uint8_t byte) { return write_decoded(byte); });
+bool JuttaConnection::write_decoded_unsafe(const uint8_t& byte) const {
+    return write_encoded_unsafe(encode(byte));
 }
 
-bool JuttaConnection::write_decoded(const std::string& data) const {
-    return std::ranges::all_of(data.begin(), data.end(), [this](char c) { return write_decoded(static_cast<uint8_t>(c)); });
+bool JuttaConnection::write_decoded_unsafe(const std::vector<uint8_t>& data) const {
+    return std::ranges::all_of(data.begin(), data.end(), [this](uint8_t byte) { return write_decoded_unsafe(byte); });
+}
+
+bool JuttaConnection::write_decoded_unsafe(const std::string& data) const {
+    return std::ranges::all_of(data.begin(), data.end(), [this](char c) { return write_decoded_unsafe(static_cast<uint8_t>(c)); });
+}
+
+bool JuttaConnection::write_decoded(const uint8_t& byte) {
+    actionLock.lock();
+    bool result = write_decoded_unsafe(byte);
+    actionLock.unlock();
+    return result;
+}
+
+bool JuttaConnection::write_decoded(const std::vector<uint8_t>& data) {
+    actionLock.lock();
+    bool result = write_decoded_unsafe(data);
+    actionLock.unlock();
+    return result;
+}
+
+bool JuttaConnection::write_decoded(const std::string& data) {
+    actionLock.lock();
+    bool result = write_decoded_unsafe(data);
+    actionLock.unlock();
+    return result;
 }
 
 void JuttaConnection::print_byte(const uint8_t& byte) {
@@ -144,14 +183,14 @@ uint8_t JuttaConnection::decode(const std::array<uint8_t, 4>& encData) {
     return decData;
 }
 
-bool JuttaConnection::write_encoded(const std::array<uint8_t, 4>& encData) const {
+bool JuttaConnection::write_encoded_unsafe(const std::array<uint8_t, 4>& encData) const {
     bool result = serial.write_serial(encData);
     serial.flush();
     std::this_thread::sleep_for(std::chrono::milliseconds{8});
     return result;
 }
 
-bool JuttaConnection::read_encoded(std::array<uint8_t, 4>& buffer) const {
+bool JuttaConnection::read_encoded_unsafe(std::array<uint8_t, 4>& buffer) const {
     size_t size = serial.read_serial(buffer);
     if (size <= 0 || size > 4) {
         SPDLOG_TRACE("No serial data found.");
@@ -165,13 +204,13 @@ bool JuttaConnection::read_encoded(std::array<uint8_t, 4>& buffer) const {
     return true;
 }
 
-size_t JuttaConnection::read_encoded(std::vector<std::array<uint8_t, 4>>& data) const {
+size_t JuttaConnection::read_encoded_unsafe(std::vector<std::array<uint8_t, 4>>& data) const {
     while (true) {
         std::array<uint8_t, 4> buffer{};
-        if (!read_encoded(buffer)) {
+        if (!read_encoded_unsafe(buffer)) {
             // Wait 100 ms for the next bunch of data to arrive:
             std::this_thread::sleep_for(std::chrono::milliseconds{100});
-            if (!read_encoded(buffer)) {
+            if (!read_encoded_unsafe(buffer)) {
                 break;
             }
         }
@@ -180,23 +219,46 @@ size_t JuttaConnection::read_encoded(std::vector<std::array<uint8_t, 4>>& data) 
     return data.size();
 }
 
-bool JuttaConnection::wait_for_ok(const std::chrono::milliseconds& timeout) const {
-    std::vector<uint8_t> buffer;
+bool JuttaConnection::wait_for_ok(const std::chrono::milliseconds& timeout) {
+    actionLock.lock();
+    bool result = wait_for_response_unsafe("ok:\r\n", timeout);
+    actionLock.unlock();
+    return result;
+}
 
+bool JuttaConnection::wait_for_response_unsafe(const std::string& response, const std::chrono::milliseconds& timeout) const {
+    std::vector<uint8_t> buffer;
     std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
     // NOLINTNEXTLINE (hicpp-use-nullptr, modernize-use-nullptr)
     while ((timeout.count() <= 0) || ((std::chrono::steady_clock::now() - start) < timeout)) {
-        if (read_decoded(buffer)) {
-            for (size_t i = 0; (buffer.size() >= 5) && (i < buffer.size() - 4); i++) {
-                if (buffer[i] == 'o' && buffer[i + 1] == 'k' && buffer[i + 2] == ':' && buffer[i + 3] == '\r' && buffer[i + 4] == '\n') {
+        if (read_decoded_unsafe(buffer)) {
+            for (size_t i = 0; (buffer.size() >= response.size()) && (i < buffer.size() - (response.size() - 1)); i++) {
+                bool success = true;
+                for (size_t e = 0; e < response.size(); e++) {
+                    if (static_cast<char>(buffer[i + e]) != response[e]) {
+                        success = false;
+                        break;
+                    }
+                }
+                if (success) {
                     return true;
                 }
-                buffer.clear();
             }
+            buffer.clear();
         }
         std::this_thread::sleep_for(std::chrono::milliseconds{250});
     }
     return false;
+}
+
+bool JuttaConnection::write_decoded_wait_for(const std::vector<uint8_t>& data, const std::string& response, const std::chrono::milliseconds& timeout) {
+    actionLock.lock();
+    bool result = write_decoded_unsafe(data);
+    if (result) {
+        result = wait_for_response_unsafe(response, timeout);
+    }
+    actionLock.unlock();
+    return result;
 }
 
 std::string JuttaConnection::vec_to_string(const std::vector<uint8_t>& data) {
