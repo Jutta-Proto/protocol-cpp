@@ -2,6 +2,7 @@
 
 #include <array>
 #include <chrono>
+#include <memory>
 #include <mutex>
 #include <string>
 #include <vector>
@@ -76,6 +77,25 @@ class JuttaConnection {
      * [Thread Safe]
      **/
     bool write_decoded_wait_for(const std::string& data, const std::string& response, const std::chrono::milliseconds& timeout = std::chrono::milliseconds{5000});
+
+    /**
+     * Writes the given data to the coffee maker and then waits for any response with an optional timeout.
+     * The default timeout for this operation is 5 seconds.
+     * To disable the timeout, set the timeout to 0 seconds.
+     * Returns true on success.
+     * Returns false when a timeout occurred or writing failed.
+     * [Thread Safe]
+     **/
+    std::shared_ptr<std::string> write_decoded_with_response(const std::vector<uint8_t>& data, const std::chrono::milliseconds& timeout = std::chrono::milliseconds{5000});
+    /**
+     * Writes the given data to the coffee maker and then waits for any response with an optional timeout.
+     * The default timeout for this operation is 5 seconds.
+     * To disable the timeout, set the timeout to 0 seconds.
+     * Returns true on success.
+     * Returns false when a timeout occurred or writing failed.
+     * [Thread Safe]
+     **/
+    std::shared_ptr<std::string> write_decoded_with_response(const std::string& data, const std::chrono::milliseconds& timeout = std::chrono::milliseconds{5000});
 
     /**
      * Encodes the given byte into 4 JUTTA bytes and writes them to the coffee maker.
@@ -206,6 +226,15 @@ class JuttaConnection {
      * Not thread safe!
      **/
     [[nodiscard]] bool wait_for_response_unsafe(const std::string& response, const std::chrono::milliseconds& timeout = std::chrono::milliseconds{5000}) const;
+
+    /**
+     * Waits for any response with an optional timeout.
+     * The default timeout for this operation is 5 seconds.
+     * To disable the timeout, set the timeout to 0 seconds.
+     * Returns the string on success.
+     * Not thread safe!
+     **/
+    [[nodiscard]] std::shared_ptr<std::string> wait_for_str_unsafe(const std::chrono::milliseconds& timeout = std::chrono::milliseconds{5000}) const;
 };
 //---------------------------------------------------------------------------
 }  // namespace jutta_proto

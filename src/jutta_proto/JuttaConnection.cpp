@@ -4,6 +4,7 @@
 #include <cassert>
 #include <cstddef>
 #include <cstdio>
+#include <optional>
 #include <sstream>
 #include <string>
 #include <thread>
@@ -223,6 +224,41 @@ bool JuttaConnection::wait_for_ok(const std::chrono::milliseconds& timeout) {
     actionLock.lock();
     bool result = wait_for_response_unsafe("ok:\r\n", timeout);
     actionLock.unlock();
+    return result;
+}
+
+std::shared_ptr<std::string> JuttaConnection::write_decoded_with_response(const std::vector<uint8_t>& data, const std::chrono::milliseconds& timeout) {
+    std::shared_ptr<std::string> result{nullptr};
+    actionLock.lock();
+    if (write_decoded_unsafe(data)) {
+        result = wait_for_str_unsafe(timeout);
+    }
+    actionLock.unlock();
+    return result;
+}
+
+std::shared_ptr<std::string> JuttaConnection::write_decoded_with_response(const std::string& data, const std::chrono::milliseconds& timeout) {
+    std::shared_ptr<std::string> result{nullptr};
+    actionLock.lock();
+    if (write_decoded_unsafe(data)) {
+        result = wait_for_str_unsafe(timeout);
+    }
+    actionLock.unlock();
+    return result;
+}
+
+std::shared_ptr<std::string> JuttaConnection::wait_for_str_unsafe(const std::chrono::milliseconds& timeout) const {
+    std::shared_ptr<std::string> result{nullptr};
+    std::vector<uint8_t> buffer;
+    std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
+    // NOLINTNEXTLINE (hicpp-use-nullptr, modernize-use-nullptr)
+    while ((timeout.count() <= 0) || ((std::chrono::steady_clock::now() - start) < timeout)) {
+        if (read_decoded_unsafe(buffer)) {
+            result = std::make_shared<std::string>(vec_to_string(buffer));
+            break;
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds{250});
+    }
     return result;
 }
 
