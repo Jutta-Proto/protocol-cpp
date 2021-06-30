@@ -12,7 +12,6 @@ Since newer models **do not use** this old V1-Protocol any more I started this p
 2. [JURA Commands](#jura-commands)
 3. [Requirements](#requirements)
 4. [Building](#building)
-5. [Project Structure](#project-structure)
 
 ## Example
 The following example shows the interaction with a JURA coffee maker over [XMPP](https://xmpp.org/).
@@ -226,8 +225,21 @@ The following list of commands has been tested on an `Jura E6 2019 platin (15326
 * `FN:04` # Turn off the coffee water heater
 * `FN:0D` # Reset the brew group and throw out the old coffee grain
 
-## Building
+## Requirements
+The following requirements are required to build this project.
+* A C++20 compatible compiler like [gcc](https://gcc.gnu.org/) or [clang](https://clang.llvm.org/)
+* The build system is written using [CMake](https://cmake.org/)
+* For managing dependencies in CMake, we are using [conan](https://conan.io/)
 
+### Fedora
+To install those dependencies on Fedora, run the following commands:
+```bash
+sudo dnf install -y gcc clang cmake python3 python3-pip
+pip3 install --user conan
+```
+
+## Building
+Run the following commands to build this project:
 ```bash
 # Clone the repository:
 git clone git@github.com:Jutta-Proto/protocol-cpp.git
@@ -240,26 +252,4 @@ cmake ..
 cmake --build .
 ```
 
-### Step 4: Flash
-To flash the application on an ESP32 run the following commands:
-```bash
-cd esp32
-idf.py -p /dev/ttyUSB0 flash
-```
-Replace `/dev/ttyUSB0` with the port, where you plugged your ESP32 in to.
-
-It might be required, that you add your current user to the `dialout` group.  
-For this run the following command and **reboot** your pc afterwards.
-```bash
-sudo adduser "$USER" dialout
-```
-
-## Project Structure
-```
-.
-├── src # All the source code
-├── tests # All unit tests
-├── protocol_snoops # Snoops of the JURA communication with a Smart Connect [1]
-└── README.md
-```
 `[1]`: https://uk.jura.com/en/homeproducts/accessories/SmartConnect-Main-72167
