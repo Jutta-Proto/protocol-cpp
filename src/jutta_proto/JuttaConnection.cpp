@@ -63,11 +63,29 @@ bool JuttaConnection::write_decoded_unsafe(const uint8_t& byte) const {
 }
 
 bool JuttaConnection::write_decoded_unsafe(const std::vector<uint8_t>& data) const {
-    return std::ranges::all_of(data.begin(), data.end(), [this](uint8_t byte) { return write_decoded_unsafe(byte); });
+    // Bad compiler support:
+    // return std::ranges::all_of(data.begin(), data.end(), [this](uint8_t byte) { return write_decoded_unsafe(byte); });
+    // So we use this until it gets better:
+    bool result = true;
+    for (uint8_t byte : data) {
+        if (!write_decoded_unsafe(byte)) {
+            result = false;
+        }
+    }
+    return result;
 }
 
 bool JuttaConnection::write_decoded_unsafe(const std::string& data) const {
-    return std::ranges::all_of(data.begin(), data.end(), [this](char c) { return write_decoded_unsafe(static_cast<uint8_t>(c)); });
+    // Bad compiler support:
+    // return std::ranges::all_of(data.begin(), data.end(), [this](char c) { return write_decoded_unsafe(static_cast<uint8_t>(c)); });
+    // So we use this until it gets better:
+    bool result = true;
+    for (char c : data) {
+        if (!write_decoded_unsafe(static_cast<uint8_t>(c))) {
+            result = false;
+        }
+    }
+    return result;
 }
 
 bool JuttaConnection::write_decoded(const uint8_t& byte) {
