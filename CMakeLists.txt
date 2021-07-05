@@ -27,7 +27,7 @@ message(STATUS "C++ Jutta Protocol Library Options")
 message(STATUS "=======================================================")
 jutta_proto_option(JUTTA_PROTO_BUILD_TESTS "Set to ON to build tests." ON)
 jutta_proto_option(JUTTA_PROTO_STATIC_ANALYZE "Set to ON to enable the GCC 10 static analysis. If enabled, JUTTA_PROTO_ENABLE_LINTING has to be disabled." OFF)
-jutta_proto_option(JUTTA_PROTO_ENABLE_LINTING "Set to ON to enable clang linting. If enabled, JUTTA_PROTO_STATIC_ANALYZE has to be disabled." ON)
+jutta_proto_option(JUTTA_PROTO_ENABLE_LINTING "Set to ON to enable clang linting. If enabled, JUTTA_PROTO_STATIC_ANALYZE has to be disabled." OFF)
 message(STATUS "=======================================================")
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_BINARY_DIR})
