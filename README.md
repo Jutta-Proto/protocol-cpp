@@ -238,6 +238,14 @@ sudo dnf install -y gcc clang cmake python3 python3-pip
 pip3 install --user conan
 ```
 
+### Raspberry Pi
+To install those dependencies on a Raspberry Pi, running the [Raspberry Pi OS](https://www.raspberrypi.org/software/), run the following commands:
+```bash
+sudo apt install -y cmake python3 python3-pip
+pip3 install --user conan
+```
+For all the other requirements, head over here: https://github.com/Jutta-Proto/hardware-pi#raspberry-pi-os
+
 ## Building
 Run the following commands to build this project:
 ```bash
