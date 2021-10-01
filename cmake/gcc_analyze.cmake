@@ -1,9 +1,6 @@
 include(CheckCXXCompilerFlag)
 
 if(JUTTA_PROTO_STATIC_ANALYZE)
-    if(JUTTA_PROTO_ENABLE_LINTING)
-        message(FATAL_ERROR "Linting and the GCC static analysis can not be enabled at the same time! Disable either JUTTA_PROTO_STATIC_ANALYZE or JUTTA_PROTO_ENABLE_LINTING.")
-    endif()
     if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
         check_cxx_compiler_flag("-fanalyzer" HAS_GCC_STATIC_ANALYZER)
         if(HAS_GCC_STATIC_ANALYZER)
