@@ -55,6 +55,7 @@ bool JuttaConnection::read_decoded_unsafe(std::vector<uint8_t>& data) const {
     for (const std::array<uint8_t, 4>& buffer : dataBuffer) {
         data.push_back(decode(buffer));
     }
+    SPDLOG_DEBUG("Read: {}", vec_to_string(data));
     return true;
 }
 
