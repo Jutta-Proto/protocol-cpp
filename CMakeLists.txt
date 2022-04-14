@@ -48,37 +48,14 @@ endif()
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
 
-get_property(isMultiConfig GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
-if (NOT isMultiConfig)
-    set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "${ALLOWED_BUILD_TYPES}")
-    if (NOT CMAKE_BUILD_TYPE)
-        set(CMAKE_BUILD_TYPE Debug CACHE STRING "" FORCE)
-    elseif(NOT CMAKE_BUILD_TYPE IN_LIST ALLOWED_BUILD_TYPES)
-        message(FATAL_ERROR "Invalid build type: ${CMAKE_BUILD_TYPE}")
-    endif()
-else ()
-    unset(CMAKE_BUILD_TYPE)
-    foreach(TYPE ${ALLOWED_BUILD_TYPES})
-    if (NOT ${TYPE} IN_LIST CMAKE_CONFIGURATION_TYPES)
-        list(APPEND CMAKE_CONFIGURATION_TYPES ${TYPE})
-    endif()  
-    endforeach()  
-endif()
-
 if(NOT EXISTS "${CMAKE_BINARY_DIR}/conan.cmake")
   message(STATUS "Downloading conan.cmake from https://github.com/conan-io/cmake-conan")
-  file(DOWNLOAD "https://raw.githubusercontent.com/conan-io/cmake-conan/v0.16.1/conan.cmake"
+  file(DOWNLOAD "https://raw.githubusercontent.com/conan-io/cmake-conan/0.18.1/conan.cmake"
                 "${CMAKE_BINARY_DIR}/conan.cmake"
-                EXPECTED_HASH SHA256=396e16d0f5eabdc6a14afddbcfff62a54a7ee75c6da23f32f7a31bc85db23484
                 TLS_VERIFY ON)
 endif()
 
 include(${CMAKE_BINARY_DIR}/conan.cmake)
-
-conan_cmake_configure(REQUIRES catch2/2.13.6
-                               spdlog/1.8.5
-                      GENERATORS cmake_find_package
-                      BUILD missing)
 
 set(CONAN_CONFIGS"Release;Debug;RelWithDebInfo")
 if(NOT CMAKE_BUILD_TYPE IN_LIST CONAN_CONFIGS)
@@ -87,8 +64,11 @@ else()
     set(CONAN_BUILD_TYPE ${CMAKE_BUILD_TYPE})
 endif()
 
+conan_cmake_configure(REQUIRES catch2/2.13.8
+                               spdlog/1.10.0
+                      GENERATORS cmake_find_package
+                      BUILD missing)
 conan_cmake_autodetect(settings)
-
 conan_cmake_install(PATH_OR_REFERENCE .
                     BUILD missing
                     REMOTE conancenter
