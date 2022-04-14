@@ -305,7 +305,7 @@ bool JuttaConnection::wait_for_response_unsafe(const std::string& response, cons
     return false;
 }
 
-bool JuttaConnection::write_decoded_wait_for(const std::vector<uint8_t>& data, const std::string& response, const std::chrono::milliseconds& timeout) {
+bool JuttaConnection::write_decoded_wait_for(const std::string& data, const std::string& response, const std::chrono::milliseconds& timeout) {
     actionLock.lock();
     bool result = write_decoded_unsafe(data);
     if (result) {

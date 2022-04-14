@@ -29,7 +29,8 @@ Checks: '*,
 -hicpp-signed-bitwise,
 -misc-no-recursion,
 -altera-unroll-loops,
--altera-id-dependent-backward-branch
+-altera-id-dependent-backward-branch,
+-bugprone-easily-swappable-parameters
 '
 WarningsAsErrors: '*'
 HeaderFilterRegex: 'src/*.hpp'
