@@ -39,6 +39,7 @@ void SerialConnection::openTty(const std::string& device) {
     // NOLINTNEXTLINE (hicpp-signed-bitwise)
     fd = open(device.c_str(), O_RDWR | O_NOCTTY | O_NDELAY);
     if (fd < 0) {
+        // NOLINTNEXTLINE (concurrency-mt-unsafe)
         throw std::runtime_error("Failed to open '" + device + "' with: " + strerror(errno));
     }
     tcflush(fd, TCIOFLUSH);
@@ -56,6 +57,7 @@ void SerialConnection::configureTty() {
 
     termios config{};
     if (tcgetattr(fd, &config) < 0) {
+        // NOLINTNEXTLINE (concurrency-mt-unsafe)
         throw std::runtime_error("Failed to get configuration for '" + device + "' with: " + strerror(errno));
     }
 
@@ -76,10 +78,12 @@ void SerialConnection::configureTty() {
      **/
     config.c_cc[VMIN] = 4;
     if (cfsetispeed(&config, B9600) < 0 || cfsetospeed(&config, B9600) < 0) {
+        // NOLINTNEXTLINE (concurrency-mt-unsafe)
         throw std::runtime_error("Failed to set the baud rate for '" + device + "' with: " + strerror(errno));
     }
 
     if (tcsetattr(fd, TCSANOW, &config) < 0) {
+        // NOLINTNEXTLINE (concurrency-mt-unsafe)
         throw std::runtime_error("Failed to set configuration for '" + device + "' with: " + strerror(errno));
     }
     state = SC_READY;

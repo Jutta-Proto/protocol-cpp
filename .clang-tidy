@@ -27,7 +27,9 @@ Checks: '*,
 -llvmlibc-restrict-system-libc-headers,
 -fuchsia-multiple-inheritance,
 -hicpp-signed-bitwise,
--misc-no-recursion
+-misc-no-recursion,
+-altera-unroll-loops,
+-altera-id-dependent-backward-branch
 '
 WarningsAsErrors: '*'
 HeaderFilterRegex: 'src/*.hpp'
