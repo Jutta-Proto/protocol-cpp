@@ -7,7 +7,8 @@
 #include <vector>
 #include <spdlog/spdlog.h>
 
-const std::array<uint8_t, 16> numbers3 = {0x08, 0x0E, 0x0C, 0x04, 0x03, 0x0D, 0x0A, 0x0B, 0x00, 0x0F, 0x06, 0x07, 0x02, 0x05, 0x01, 0x09};
+const std::array<uint8_t, 16> disc1 = {0x08, 0x0E, 0x0C, 0x04, 0x03, 0x0D, 0x0A, 0x0B, 0x00, 0x0F, 0x06, 0x07, 0x02, 0x05, 0x01, 0x09};
+const std::array<uint8_t, 16> disc2 = {0x04, 0x0B, 0x0D, 0x0A, 0x00, 0x07, 0x0F, 0x05, 0x09, 0x08, 0x03, 0x01, 0x0E, 0x02, 0x0C, 0x06};
 
 //--------------------------------------------------------------------------------------------------------------------------
 // const std::array<uint8_t, 16> numbers1 = {14, 4, 3, 2, 1, 13, 8, 11, 6, 15, 12, 7, 10, 5, 0, 9};
@@ -25,9 +26,9 @@ uint8_t mod256(int i) {
 
 uint8_t shuffle(int dataNibble, int nibbleCount, int keyLeftNibbel, int keyRightNibbel) {
     uint8_t i5 = mod256(nibbleCount >> 4);
-    uint8_t tmp1 = numbers3[mod256(dataNibble + nibbleCount + keyLeftNibbel) % 16];
-    uint8_t tmp2 = numbers3[mod256(tmp1 + keyRightNibbel + i5 - nibbleCount - keyLeftNibbel) % 16];
-    uint8_t tmp3 = numbers3[mod256(tmp2 + keyLeftNibbel + nibbleCount - keyRightNibbel - i5) % 16];
+    uint8_t tmp1 = disc1[mod256(dataNibble + nibbleCount + keyLeftNibbel) % 16];
+    uint8_t tmp2 = disc2[mod256(tmp1 + keyRightNibbel + i5 - nibbleCount - keyLeftNibbel) % 16];
+    uint8_t tmp3 = disc1[mod256(tmp2 + keyLeftNibbel + nibbleCount - keyRightNibbel - i5) % 16];
     return mod256(tmp3 - nibbleCount - keyLeftNibbel) % 16;
 }
 
@@ -47,6 +48,28 @@ std::vector<uint8_t> encDecBytes(const std::vector<uint8_t>& data, uint8_t key) 
     }
     return result;
 }
+
+void comp(const std::vector<uint8_t>& a, const std::vector<uint8_t>& b) {
+    assert(a.size() == b.size());
+    for (size_t i = 0; i < a.size(); i++) {
+        assert(a[i] == b[i]);
+    }
+}
+
+std::vector<uint8_t> encDecBytes(const std::vector<uint8_t>& input) {
+    std::vector<uint8_t> data;
+    uint8_t key = input[1];
+    if (key == 0x1b) {
+        key = input[2] ^ 0x80;
+        data.insert(data.end(), input.begin() + 2, input.end());
+        data[0] = key;
+    } else {
+        data.insert(data.end(), input.begin() + 1, input.end());
+    }
+    std::vector<uint8_t> result = encDecBytes(data, key);
+    comp(encDecBytes(result, key), data);
+    return result;
+}
 //--------------------------------------------------------------------------------------------------------------------------
 
 void discBasedDecryption(uint8_t* dst, uint8_t* src) {
@@ -59,7 +82,6 @@ void discBasedDecryption(uint8_t* dst, uint8_t* src) {
     uint8_t keyRightNibble = 0;
     uint8_t bVar1 = 0;
     uint8_t cVar1 = 0;
-    const uint8_t* decodeDisc = nullptr;
 
     key = src[1];
     if (key == 0x1b) {
@@ -69,7 +91,6 @@ void discBasedDecryption(uint8_t* dst, uint8_t* src) {
     } else {
         data = src + 1;
     }
-    decodeDisc = numbers3.data();
     keyLeftNibble = key >> 4;
     keyRightNibble = key & 0xf;
     curchar = data[1];
@@ -83,15 +104,15 @@ void discBasedDecryption(uint8_t* dst, uint8_t* src) {
         }
         bVar1 = nibbelCount + 1;
         uint8_t discOff1 = ((curchar >> 4) + nibbelCount + keyLeftNibble) & 0xf;
-        uint8_t discOff2 = (((((decodeDisc[discOff1] + keyRightNibble) - nibbelCount) - keyLeftNibble) + (nibbelCount >> 4)) & 0xf) + 0x10;
-        uint8_t discOff3 = (((keyLeftNibble + nibbelCount + decodeDisc[discOff2]) - keyRightNibble) - (nibbelCount >> 4)) & 0xf;
-        cVar1 = decodeDisc[discOff3] - nibbelCount;
+        uint8_t discOff2 = ((disc1[discOff1] + keyRightNibble - nibbelCount - keyLeftNibble + (nibbelCount >> 4)) & 0xf) + 0x10;
+        uint8_t discOff3 = (((keyLeftNibble + nibbelCount + disc2[discOff2]) - keyRightNibble) - (nibbelCount >> 4)) & 0xf;
+        cVar1 = disc1[discOff3] - nibbelCount;
         nibbelCount = nibbelCount + 2;
 
         uint8_t discOff4 = ((curchar & 0xf) + bVar1 + keyLeftNibble) & 0xf;
-        uint8_t discOff5 = ((((decodeDisc[discOff4] + keyRightNibble + (bVar1 >> 4)) - keyLeftNibble) - bVar1) & 0xf) + 0x10;
-        uint8_t discOff6 = (((keyLeftNibble + bVar1 + decodeDisc[discOff5]) - keyRightNibble) - (bVar1 >> 4)) & 0xf;
-        *dst = ((cVar1 - keyLeftNibble) << 4) | (((decodeDisc[discOff6] - bVar1) - keyLeftNibble) & 0xf);
+        uint8_t discOff5 = ((((disc1[discOff4] + keyRightNibble + (bVar1 >> 4)) - keyLeftNibble) - bVar1) & 0xf) + 0x10;
+        uint8_t discOff6 = (((keyLeftNibble + bVar1 + disc2[discOff5]) - keyRightNibble) - (bVar1 >> 4)) & 0xf;
+        *dst = ((cVar1 - keyLeftNibble) << 4) | (((disc1[discOff6] - bVar1) - keyLeftNibble) & 0xf);
         dst++;
         data = pcVar1;
         curchar = pcVar1[1];
@@ -101,9 +122,20 @@ void discBasedDecryption(uint8_t* dst, uint8_t* src) {
 
 std::vector<uint8_t> decode(const std::vector<uint8_t>& data) {
     std::vector<uint8_t> input;
-    input.insert(input.begin(), data.begin(), data.end());
+    input.insert(input.end(), data.begin(), data.end());
     discBasedDecryption(input.data(), input.data());
     return input;
+}
+
+void test(uint8_t key) {
+    uint8_t keyLeftNibble = key >> 4;
+    uint8_t keyRightNibble = key & 0xf;
+
+    uint8_t output = '@';
+    uint8_t outputLeftNibble = output >> 4;
+    uint8_t outputRightNibble = output & 0xf;
+
+    uint8_t cVar1 = outputLeftNibble + keyLeftNibble;
 }
 
 int main(int /*argc*/, char** /*argv*/) {
@@ -151,12 +183,19 @@ int main(int /*argc*/, char** /*argv*/) {
         break;
     }
 
+    test();
+
     std::vector<uint8_t> response;
     while (true) {
         connection.read_decoded(response);
         if (!response.empty()) {
             if (response[0] == '&') {
-                SPDLOG_INFO("Received: {}", connection.vec_to_string(decode(response)));
+                std::vector<uint8_t> dec1 = decode(response);
+                std::string s1 = jutta_proto::JuttaConnection::vec_to_string(dec1);
+                SPDLOG_INFO("Received1: {}", s1);
+                std::vector<uint8_t> dec2 = encDecBytes(response);
+                std::string s2 = jutta_proto::JuttaConnection::vec_to_string(dec2);
+                SPDLOG_INFO("Received2: {}", s2);
             }
             response.clear();
         }
